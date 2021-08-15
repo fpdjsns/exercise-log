@@ -2,28 +2,45 @@
   <div>
 <!--    <button @click = "addTodo()">추가해라</button>-->
 
-    <div>sheetId : <input v-model="sheetId" placeholder="sheetId"></div>
-    <div>sheetName : <input v-model="sheetName" placeholder="sheetName"></div>
-    <div>apiKey :  <input v-model="apiKey" placeholder="apiKey"></div>
-    <button @click= "get()">정보 가져오기</button>
+    <div class="apiInfo">
+      <div>sheetId : <input v-model="sheetId" placeholder="sheetId"></div>
+      <div>sheetName : <input v-model="sheetName" placeholder="sheetName"></div>
+      <div>apiKey :  <input v-model="apiKey" placeholder="apiKey"></div>
+      <button @click= "get()">정보 가져오기</button>
+    </div>
+    <p></p>
 
-    <table class="table">
-      <thead>
+    <table class="table" :style="style.table">
+      <thead :style="style.thread">
       <tr>
-        <th>
-        </th>
-        <th>name</th>
-        <th>todo</th>
+        <th>일자</th>
+        <th>유산소</th>
+        <th>무산소</th>
+        <th>몸무게</th>
+        <th>운동목록</th>
       </tr>
       </thead>
-      <tbody>
+      <tbody :style="style.tbody">
 
-      <tr v-for="item in this.todos()" v-bind:key="item.key">
-        <td>
-          <input type="checkbox" :value="item.key">
-        </td>
-        <td>{{item.name}}</td>
-        <td>{{item.todo}}</td>
+      <tr v-for="item in this.items()" v-bind:key="item.key">
+        <template v-if="item.summary">
+          <td>{{item.date}}</td>
+          <td></td>
+          <td></td>
+          <td>{{item.weight}}</td>
+          <td>{{item.list}}</td>
+        </template>
+        <template v-else>
+          <td>{{item.date}}</td>
+          <td>
+            <input type="checkbox" v-model="item.isCardio">
+          </td>
+          <td>
+            <input type="checkbox" v-model="item.isWeightTraining">
+          </td>
+          <td>{{item.weight}}</td>
+          <td>{{item.list}}</td>
+        </template>
       </tr>
       </tbody>
     </table>
@@ -40,24 +57,39 @@ export default {
       msg: 'Exercise Log',
       sheetId: '',
       sheetName: '',
-      apiKey: ''
+      apiKey: '',
+
+      style: {
+        table: {
+          borderCollapse: 'collapse',
+          padding: '10px',
+          border: '2px solid #ddd',
+          borderTop: '3px solid #fb7399'
+        },
+
+        thread: {
+          color: '#fb7399',
+          background: '#f7e6ec',
+          textAlign: 'center'
+        },
+
+        tbody: {
+          color: '#0094D7'
+        }
+      }
     }
   },
   created () {
   },
   methods: {
     get () {
-      this.getTodos({sheetId: this.sheetId, sheetName: this.sheetName, apiKey: this.apiKey})
-    },
-    addTodo () {
-      this.name = ''
-      this.todo = ''
+      this.getItems({sheetId: this.sheetId, sheetName: this.sheetName, apiKey: this.apiKey})
     },
     ...mapState({
-      todos: state => state.googleSheet.todos
+      items: state => state.googleSheet.items
     }),
     ...mapActions({
-      getTodos: 'googleSheet/getTodos'
+      getItems: 'googleSheet/getItems'
     })
   }
 }
@@ -65,4 +97,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+th {
+  padding: 10px
+}
 </style>
